@@ -37,14 +37,14 @@ export const getAllUsers = async (page, size, search = '') => {
         const url = api.get("/get", {
             params: {
                 page: page, // Dynamic page number
-                size: size , // Dynamic page size
+                size: size, // Dynamic page size
                 search: search
             },
 
             headers: {
-                'Authorization': `Bearer ${token}`, 
-                'Accept': 'application/json', 
-                'Content-Type': 'application/json' 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         });
         console.log(url);
@@ -55,11 +55,6 @@ export const getAllUsers = async (page, size, search = '') => {
         throw error.response.data || new Error('Failed to get all users');
     }
 };
-
-
-
-
-
 
 
 export const getUserById = async (id) => {
@@ -120,3 +115,36 @@ export const updateUserStatus = async (id, status) => {
         throw error.response?.data || new Error('Failed to update user status');
     }
 };
+
+
+export const deleteUser = async (id) => {
+    try {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            throw new Error('No token found. Please log in.');
+        }
+
+        await api.delete(`/delete/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('User deleted successfully');
+    } catch (error) {
+        console.error('Failed to delete user:', error.response?.data || error.message);
+        throw error.response?.data || new Error('Failed to delete user');
+    }
+}
+
+
+export const changePassword = async (data) => {
+    try {
+      const response = await api.post('/changePassword', data);
+      return response.data;
+    } catch (error) {
+      throw error.response.data || new Error('Failed to reset password');
+    }
+  };

@@ -1,7 +1,7 @@
-// src/context/AuthContext.js
 import React, { createContext, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
+import { jwtDecode } from 'jwt-decode'; 
+import { logoutUser } from '../service/AuthService'
 
 const AuthContext = createContext();
 
@@ -24,11 +24,18 @@ export const AuthProvider = ({ children }) => {
     navigate('/'); // Redirect to home or dashboard after login
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token'); // Remove token from localStorage
-    navigate('/login'); // Redirect to login page after logout
+  const logout = async () => {
+    try {
+      if (token) {
+        await logoutUser();
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem('token'); 
+        navigate('/login'); 
+      }
+    } catch (error) {
+      console.error('Logout failed:', error.message);
+    }
   };
 
   return (

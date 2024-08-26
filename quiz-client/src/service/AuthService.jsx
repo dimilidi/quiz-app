@@ -36,3 +36,20 @@ export const registerUserByAdmin = async (userData) => {
 };
 
 
+export const logoutUser = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found');
+
+        await api.post('/logout', {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        localStorage.removeItem('token');
+    } catch (error) {
+        console.error('Logout failed:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: "http://localhost:8080/password"
+  baseURL: "http://localhost:8080/password"
 })
 
 export const requestPasswordReset = async (data) => {
@@ -21,3 +21,6 @@ export const resetPassword = async (data) => {
     throw error.response.data || new Error('Failed to reset password');
   }
 };
+
+
+

@@ -20,6 +20,7 @@ import AllUsers from "./components/AllUsers"
 import UpdateUser from "./components/UpdateUser"
 import PasswordResetRequest from "./components/PasswordResetRequest"
 import PasswordResetForm from "./components/PasswordResetForm"
+import ChangePassword from "./components/ChangePassword"
 
 function App() {
 	return (
@@ -37,6 +38,8 @@ function App() {
 					{/* Protected routes - only for signed-in users */}
 
 					<Route path="/" element={<Home />} />
+					<Route path="/password/change" element={<ChangePassword />} />
+
 
 					{/* STUDENT */}
 					<Route

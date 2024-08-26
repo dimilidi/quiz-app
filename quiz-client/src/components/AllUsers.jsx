@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useTable, usePagination, useGlobalFilter } from 'react-table';
 import ReactPaginate from 'react-paginate';
+import { getAllUsers, updateUserStatus, deleteUser } from '../service/UsersService'; 
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getAllUsers, updateUserStatus } from '../service/UsersService';
 
 function AllUsers() {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [pageCount, setPageCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10); // Default page size
+    const [pageSize, setPageSize] = useState(10); 
 
     const navigate = useNavigate();
 
@@ -38,8 +39,20 @@ function AllUsers() {
             ));
         } catch (error) {
             console.error('Failed to update status', error);
+            toast.error(error.message)
         }
     };
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteUser(id);
+            fetchUsers(); // Refresh the list of users
+        } catch (error) {
+            console.error('Failed to delete user', error);
+            toast.error(error.message)
+        }
+    };
+    
 
     const columns = useMemo(
         () => [
@@ -114,15 +127,6 @@ function AllUsers() {
         navigate(`/admin/update/${id}`);
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await axios.delete(`/api/users/${id}`);
-            fetchUsers(); // Re-fetch users after deletion
-        } catch (error) {
-            console.error('Failed to delete user', error);
-        }
-    };
-
     const handlePageSizeChange = (e) => {
         setPageSize(Number(e.target.value));
         setCurrentPage(0); // Reset to the first page on page size change
@@ -130,6 +134,7 @@ function AllUsers() {
 
     return (
         <div className="container mt-4">
+            <ToastContainer />
             <h2 className="mb-4">All Users</h2>
             <input
                 type="text"
