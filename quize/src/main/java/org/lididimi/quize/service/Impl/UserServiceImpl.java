@@ -16,6 +16,7 @@ import org.lididimi.quize.model.entity.Role;
 import org.lididimi.quize.model.entity.User;
 import org.lididimi.quize.model.enums.StatusNameEnum;
 import org.lididimi.quize.model.enums.UserRoleNameEnum;
+import org.lididimi.quize.repository.PasswordResetTokenRepository;
 import org.lididimi.quize.repository.RoleRepository;
 import org.lididimi.quize.repository.UserRepository;
 import org.lididimi.quize.security.filter.JwtFilter;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtFilter jwtFilter;
     private final RoleRepository roleRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     //   private final EmailServiceImpl emailService;
 
     public UserServiceImpl(
@@ -51,14 +52,15 @@ public class UserServiceImpl implements UserService {
             PasswordEncoder passwordEncoder,
             JwtFilter jwtFilter,
             //EmailServiceImpl emailService
-            RoleRepository roleRepository) {
+            RoleRepository roleRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.quizUserDetailsService = quizUserDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.jwtFilter = jwtFilter;
-       // this.emailService = emailService;
+        // this.emailService = emailService;
         this.roleRepository = roleRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Override
@@ -80,9 +82,15 @@ public class UserServiceImpl implements UserService {
         if (jwtFilter.isAdmin()) {
             Optional<User> optionalUser = userRepository.findById(updateStatusDTO.getId());
             if (optionalUser.isPresent()) {
-                StatusNameEnum status = updateStatusDTO.getStatus();
-                userRepository.updateStatus(status, updateStatusDTO.getId());
-                sendMailToAllAdmins(status, optionalUser.get().getEmail(), userRepository.getAllAdmins(UserRoleNameEnum.ADMIN));
+                User userToUpdate = optionalUser.get();
+                StatusNameEnum newStatus = updateStatusDTO.getStatus();
+
+                // Use the new method to check for active admin constraints
+                checkMinimumActiveAdmins(userToUpdate, newStatus);
+
+                // Update the user's status
+                userRepository.updateStatus(newStatus, updateStatusDTO.getId());
+                sendMailToAllAdmins(newStatus, userToUpdate.getEmail(), userRepository.getAllAdmins(UserRoleNameEnum.ADMIN));
                 return QuizConstants.USER_UPDATE_SUCCESS;
             } else {
                 throw new ObjectNotFoundException(QuizConstants.USER_NOT_FOUND);
@@ -91,6 +99,8 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException(QuizConstants.UNAUTHORIZED_ACCESS);
         }
     }
+
+
 
     @Override
     public String changePassword(UserChangePasswordDTO userChangePasswordDTO) {
@@ -105,7 +115,7 @@ public class UserServiceImpl implements UserService {
                 throw new BadCredentialsException(QuizConstants.INCORRECT_OLD_PASSWORD);
             }
         } else {
-                throw new ObjectNotFoundException(QuizConstants.USER_NOT_FOUND);
+            throw new ObjectNotFoundException(QuizConstants.USER_NOT_FOUND);
         }
     }
 
@@ -123,7 +133,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userOptional.get();
 
-       return convertToDto(user);
+        return convertToDto(user);
     }
 
     @Override
@@ -149,6 +159,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingUser);
     }
 
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        if (jwtFilter.isAdmin()) {
+            User userToDelete = userRepository.findById(id).orElseThrow(() -> new MissingException(QuizConstants.USER_NOT_FOUND));
+
+            // Use the new method to check for active admin constraints
+            checkMinimumActiveAdmins(userToDelete, StatusNameEnum.INACTIVE);
+
+            // Proceed with the deletion
+            passwordResetTokenRepository.deleteByUserId(id);
+            userRepository.delete(userToDelete);
+            log.info("Deleted user with ID: {}", id);
+        } else {
+            throw new BadCredentialsException(QuizConstants.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+
+
+
     private UserDTO convertToDto(User user) {
         List<UserRoleNameEnum> userRoleNameEnumList = user.getRoles().stream().map(Role::getName).toList();
 
@@ -167,6 +198,23 @@ public class UserServiceImpl implements UserService {
             emailService.sendSimpleMessage(jwtFilter.currentUser(), "Account disabled.", "User: " + user + "\nis disabled by\nAdmin: " + jwtFilter.currentUser(), allAdmins);
         }*/
     }
+
+    private void checkMinimumActiveAdmins(User userToCheck, StatusNameEnum newStatus) {
+        // Check if the user to check is an admin
+        boolean isAdminToCheck = userToCheck.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(UserRoleNameEnum.ADMIN));
+
+        if (isAdminToCheck && newStatus.equals(StatusNameEnum.INACTIVE)) {
+            // Check if there are any other active admins left
+            long activeAdminsCount = userRepository.countByRolesNameAndStatus(UserRoleNameEnum.ADMIN, StatusNameEnum.ACTIVE);
+
+            if (activeAdminsCount <= 1) {
+                throw new InvalidException(QuizConstants.ADMIN_UPDATE_INVALID);
+            }
+        }
+    }
+
+
 }
 
 

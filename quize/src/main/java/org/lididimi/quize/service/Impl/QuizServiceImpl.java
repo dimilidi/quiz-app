@@ -48,13 +48,10 @@ public class QuizServiceImpl implements QuizService {
     @Transactional
     @Override
     public List<QuestionDTO> getQuizQuestions(Long id) {
-        System.out.println("******************************************");
-        System.out.println("Inside getQuizQuestions");
         Quiz quiz = quizRepository.findById(id).orElseThrow(NoSuchElementException::new);
 
         List<Question> questionsFromDB = quiz.getQuestions();
-        System.out.println("+++++++++++ CORRECT ANSWERS");
-        System.out.println(questionsFromDB.get(0).getCorrectAnswers());
+
         List<QuestionDTO> questionDTOs = new ArrayList<>();
         for (Question question : questionsFromDB) {
             QuestionDTO questionDTO = modelMapper.map(question, QuestionDTO.class);

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.lididimi.quize.service.TokenBlackListService;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.charset.StandardCharsets;
@@ -24,11 +25,13 @@ public class JwtServiceImpl implements JwtService {
 
     private final String jwtSecret;
     private final long expiration;
+    private final TokenBlackListService tokenBlackListService;
 
     public JwtServiceImpl(@Value("${jwt.secret}") String jwtSecret,
-                          @Value("${jwt.expiration}") long expiration) {
+                          @Value("${jwt.expiration}") long expiration, TokenBlackListService tokenBlackListService) {
         this.jwtSecret = jwtSecret;
         this.expiration = expiration;
+        this.tokenBlackListService = tokenBlackListService;
     }
 
     @Override
@@ -49,6 +52,10 @@ public class JwtServiceImpl implements JwtService {
     public Boolean validateToken(String token, UserDetails userDetails) {
         log.info("Validated JWT token: {}", token);
         final String username = extractUsername(token);
+
+        if (tokenBlackListService.isBlacklisted(token)) {
+            return false;
+        }
 
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

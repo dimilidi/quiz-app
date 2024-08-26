@@ -10,13 +10,11 @@ import org.lididimi.quize.model.dto.user.UserRegisterDTO;
 import org.lididimi.quize.model.enums.UserRoleNameEnum;
 import org.lididimi.quize.model.response.SuccessResponse;
 import org.lididimi.quize.service.AuthService;
+import org.lididimi.quize.service.TokenBlackListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +25,7 @@ import java.util.Map;
 public class AuthenticationController {
 
     private final AuthService authService;
+    private final TokenBlackListService tokenBlacklistService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO, BindingResult bindingResult) throws MessagingException {
@@ -65,4 +64,14 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.substring(7); // Remove "Bearer " prefix
+
+        tokenBlacklistService.addToBlacklist(jwtToken);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

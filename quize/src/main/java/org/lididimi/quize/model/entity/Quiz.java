@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -23,4 +25,8 @@ public class Quiz {
 
     @ManyToMany()
     private List<Question> questions;
+
+    @CreationTimestamp
+    @Column(nullable = false)
+    private Instant createdDate;
 }

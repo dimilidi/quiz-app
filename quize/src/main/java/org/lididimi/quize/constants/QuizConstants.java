@@ -20,24 +20,11 @@ public class QuizConstants {
     public static final String EMAIL_NOT_FOUND = String.format("Email not found.");
     public static final String TOKEN_EXPIRED = String.format("Token expired.");
     public static final String TOKEN_RESET_URL_BASE = "http://localhost:5173/password/reset/";
-
-    // PRODUCT
-    public static final String PRODUCT_ADD_SUCCESS = String.format("Successfully added product.");
-    public static final String PRODUCT_UPDATE_SUCCESS = String.format("Product updated successfully.");
-    public static final String PRODUCT_NOT_FOUND = String.format("Product not found.");
-    public static final String PRODUCT_DELETE_SUCCESS = String.format( "Product deleted successfully.");
-
-    //CATEGORY
-    public static final String CATEGORY_ADD_SUCCESS = String.format("Category added successfully.");
-    public static final String CATEGORY_NOT_FOUND = String.format("Category not found.");
-    public static final String CATEGORY_UPDATE_SUCCESS = String.format("Category updated successfully.");
-    public static final String ALREADY_EXISTS = String.format("Category name already exists");
+    public static final String USER_DELETE_SUCCESS = String.format("User deleted successfully.");
+    public static final String ADMIN_DELETE_INVALID = String.format("At least one admin should be active");
+    public static final String ADMIN_UPDATE_INVALID = String.format("At least one admin should be active");
 
 
-    //BILL
-    public static final String BILL_NOT_FOUND = String.format(MESSAGE_TEMPLATE, "Bill not found.");
-    public static final String BILL_DELETE_SUCCESS = String.format(MESSAGE_TEMPLATE, "Bill deleted successfully.");
-    public static final String PDF_GENERATION_FAILURE = String.format(MESSAGE_TEMPLATE, "Failed to generate PDF");
 
 }
 

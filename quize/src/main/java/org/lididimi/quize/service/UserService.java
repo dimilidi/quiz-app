@@ -11,9 +11,6 @@ import java.util.List;
 
 public interface UserService {
 
- //   List<UserDTO> getAllUsers();
-
-    //Page<UserDTO> getAllUsers(int page, int size);
     Page<UserDTO> getAllUsers(int page, int size, String search);
 
     String updateStatus(UserUpdateStatusDTO userUpdateStatusDTO);
@@ -23,4 +20,6 @@ public interface UserService {
     UserDTO findUserById(Long id);
 
     void updateUser(Long id, UserUpdateDTO userUpdateDTO);
+
+    void deleteUser(Long id);
 }

@@ -39,4 +39,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    long countByRolesNameAndStatus(UserRoleNameEnum roleName, StatusNameEnum status);
 }

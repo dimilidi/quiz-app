@@ -2,6 +2,7 @@ package org.lididimi.quize.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.lididimi.quize.constants.QuizConstants;
 import org.lididimi.quize.model.dto.user.UserChangePasswordDTO;
 import org.lididimi.quize.model.dto.user.UserDTO;
 import org.lididimi.quize.model.dto.user.UserUpdateDTO;
@@ -84,5 +85,12 @@ public class UserManagementController {
         SuccessResponse response = new SuccessResponse(HttpStatus.OK.value(), userService.changePassword(userChangePasswordDTO), null);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<SuccessResponse> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(new SuccessResponse(HttpStatus.OK.value(), QuizConstants.USER_DELETE_SUCCESS));
+    }
+
 }
 
