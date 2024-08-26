@@ -1,0 +1,74 @@
+# Node.js (React)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# React Build
+build/
+dist/
+*.bundle.js
+*.bundle.js.map
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log files
+logs
+*.log
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Java
+*.class
+*.log
+*.war
+*.ear
+*.jar
+
+# Compiled source files
+target/
+out/
+
+# Maven
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse files
+.settings/
+.classpath
+.project
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# NetBeans files
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Build directories for Java projects
+/bin/
+/build/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
