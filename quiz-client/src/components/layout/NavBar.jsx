@@ -57,13 +57,18 @@ const Navbar = () => {
 						{isTeacher && (
 							<>
 								<li className="nav-item">
-									<Link to={"/create-quiz"} className="nav-link">
+									<Link to={"/create-quiz "} className="nav-link">
 										Create Quiz
 									</Link>
 								</li>
 								<li className="nav-item">
 									<Link to={"/all-quizzes"} className="nav-link">
-										Manage Quizzes
+										Manage Qizzes
+									</Link>
+								</li>
+								<li className="nav-item">
+									<Link to={"/all-questions"} className="nav-link">
+										Manage Questions
 									</Link>
 								</li>
 							</>

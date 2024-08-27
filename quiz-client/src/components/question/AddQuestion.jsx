@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react"
 
-import { Link } from "react-router-dom"
-import { createQuestion, getSubjects } from "../../service/QuizService"
+import { Link, useNavigate } from "react-router-dom"
+import { createQuestion } from "../../service/QuizService"
+import { getSubjects } from "../../service/SubjectService";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-const Addtitle = () => {
+const AddQuestion = () => {
 	const [title, settitleText] = useState("")
-	const [type, setType] = useState("single")
+	const [type, setType] = useState("SINGLE")
 	const [choices, setChoices] = useState([])
 	const [correctAnswers, setCorrectAnswers] = useState([""])
 	const [subject, setSubject] = useState("")
@@ -20,6 +21,7 @@ const Addtitle = () => {
 		choices: "",
 		correctAnswers: "",
 	});
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		fetchSubjects()
@@ -27,12 +29,13 @@ const Addtitle = () => {
 
 	const fetchSubjects = async () => {
 		try {
-			const subjectsData = await getSubjects()
-			setSubjectOptions(subjectsData)
+			const subjectsData = await getSubjects();
+			const subjects = subjectsData.map(s => s.name);
+			setSubjectOptions(subjects);
 		} catch (error) {
-			console.error(error)
+			console.error('Failed to fetch subjects:', error);
 		}
-	}
+	};
 
 	const validateForm = () => {
 		let validationErrors = {
@@ -133,13 +136,15 @@ const Addtitle = () => {
 			await createQuestion(result)
 
 			settitleText("")
-			setType("single")
+			setType("SINGLE")
 			setChoices([])
 			setCorrectAnswers([""])
 			setSubject("")
 			setErrors({})
 
 			toast.success("title added successfully!");
+
+			navigate("/all-questions")
 
 		} catch (error) {
 			console.error(error)
@@ -236,8 +241,8 @@ const Addtitle = () => {
 										value={type}
 										onChange={(event) => setType(event.target.value)}
 										className="form-control">
-										<option value="single">Single Answer</option>
-										<option value="multiple">Multiple Answer</option>
+										<option value="SINGLE">SINGLE</option>
+										<option value="MULTIPLE">MULTIPLE</option>
 									</select>
 									{errors.type && <div className="text-danger">{errors.title}</div>}
 								</div>
@@ -271,7 +276,7 @@ const Addtitle = () => {
 										Add Option
 									</button>
 								</div>
-								{type === "single" && (
+								{type === "SINGLE" && (
 									<div className="mb-3">
 										<label htmlFor="answer" className="form-label text-success">
 											Correct Answer
@@ -285,7 +290,7 @@ const Addtitle = () => {
 										/>
 									</div>
 								)}
-								{type === "multiple" && (
+								{type === "MULTIPLE" && (
 									<div className="mb-3">
 										<label htmlFor="answer" className="form-label text-success">
 											Correct Answer(s)
@@ -338,5 +343,5 @@ const Addtitle = () => {
 	)
 }
 
-export default Addtitle
+export default AddQuestion
 

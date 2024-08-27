@@ -5,7 +5,7 @@ import Home from "./components/Home"
 import QuizStepper from "./components/quiz/QuizStepper"
 import Quiz from "./components/quiz/Quiz"
 import QuizResult from "./components/quiz/QuizResult"
-import GetAllQuiz from "./components/quiz/GetAllQuiz"
+import AllQuestions from "./components/question/AllQuestions"
 import AddQuestion from "./components/question/AddQuestion"
 import UpdateQuestion from "./components/question/UpdateQuestion"
 import Navbar from "./components/layout/NavBar"
@@ -21,6 +21,8 @@ import UpdateUser from "./components/UpdateUser"
 import PasswordResetRequest from "./components/PasswordResetRequest"
 import PasswordResetForm from "./components/PasswordResetForm"
 import ChangePassword from "./components/ChangePassword"
+import CreateQuiz from "./components/quiz/CreateQuiz"
+import AllQuizzes from "./components/quiz/AllQuizzes"
 
 function App() {
 	return (
@@ -74,16 +76,24 @@ function App() {
 
 					{/* TEACHER */}
 					<Route
-						path="/create-quiz"
+						path="/add-question"
 						element={<ProtectedRoute element={<AddQuestion />} requiredRole="TEACHER" />}
 					/>
 					<Route
-						path="/update-quiz/:id"
+						path="/create-quiz"
+						element={<ProtectedRoute element={<CreateQuiz />} requiredRole="TEACHER" />}
+					/>
+					<Route
+						path="/update-question/:id"
 						element={<ProtectedRoute element={<UpdateQuestion />} requiredRole="TEACHER" />}
 					/>
 					<Route
+						path="/all-questions"
+						element={<ProtectedRoute element={<AllQuestions />} requiredRole="TEACHER" />}
+					/>
+					<Route
 						path="/all-quizzes"
-						element={<ProtectedRoute element={<GetAllQuiz />} requiredRole="TEACHER" />}
+						element={<ProtectedRoute element={<AllQuizzes />} requiredRole="TEACHER" />}
 					/>
 
 					{/* Catch-all route */}
