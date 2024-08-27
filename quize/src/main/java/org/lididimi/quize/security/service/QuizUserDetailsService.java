@@ -34,10 +34,7 @@ public class QuizUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found!"));
 
 
-        return userRepository
-                .findByEmail(email)
-                .map(QuizUserDetailsService::mapToUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found!"));
+        return userEntityDetail;
     }
 
     private static UserDetails mapToUserDetails(User userEntity) {

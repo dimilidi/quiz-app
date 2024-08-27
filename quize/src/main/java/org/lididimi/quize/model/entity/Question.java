@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.lididimi.quize.model.enums.QuestionTypeEnum;
 
 import java.util.List;
 
@@ -19,15 +20,19 @@ public class Question {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String subject;
+    @ManyToOne(optional = false)
+    private Subject subject;
 
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private QuestionTypeEnum type;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> choices;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> correctAnswers;
+
+    @ManyToMany()
+    private List<Quiz> quizzes;
 }

@@ -1,6 +1,7 @@
 package org.lididimi.quize.repository;
 
 import org.lididimi.quize.model.entity.Question;
+import org.lididimi.quize.model.enums.QuestionTypeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

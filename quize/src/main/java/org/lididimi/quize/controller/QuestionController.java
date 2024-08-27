@@ -7,12 +7,10 @@ import org.lididimi.quize.model.entity.Question;
 import org.lididimi.quize.service.QuestionService;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -26,20 +24,19 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @PostMapping("/create-new-question")
-    public ResponseEntity<QuestionDTO> createQuestion(@Valid @RequestBody QuestionDTO question) {
+    public ResponseEntity<?> createQuestion(@Valid @RequestBody QuestionDTO question, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
         QuestionDTO createdQuestion = questionService.createQuestion(question);
-        System.out.println("title: " + createdQuestion.getTitle());
-        System.out.println(question.getTitle());
         return ResponseEntity.status(CREATED).body(question);
     }
 
     @GetMapping("/all-questions")
     public ResponseEntity<List<QuestionDTO>> getAllQuestions() {
-        System.out.println("******************************************");
-
         List<QuestionDTO> questions = questionService.getAllQuestions();
-        questions.forEach(question -> System.out.println(question.getCorrectAnswers()));
-
         return ResponseEntity.ok(questions);
     }
 
@@ -66,11 +63,6 @@ public class QuestionController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/subjects")
-    public ResponseEntity<List<String>> getAllSubjects() {
-        List<String> subjects = questionService.getAllSubjects();
-        return ResponseEntity.ok(subjects);
-    }
 
     @GetMapping("/quiz/fetch-questions-for-user")
     public ResponseEntity<List<QuestionDTO>> getQuestionsForUser(
@@ -90,8 +82,8 @@ public class QuestionController {
         QuestionDTO dto = new QuestionDTO();
         dto.setId(question.getId());
         dto.setTitle(question.getTitle());
-        dto.setSubject(question.getSubject());
-        dto.setType(question.getType());
+        dto.setSubject(question.getSubject().getName());
+        dto.setType(question.getType().name());
         dto.setChoices(question.getChoices());
 
         return dto;

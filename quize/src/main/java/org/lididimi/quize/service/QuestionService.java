@@ -13,8 +13,6 @@ public interface QuestionService {
 
     Optional<QuestionDTO> getQuestionById(Long id);
 
-    List<String> getAllSubjects();
-
     QuestionDTO updateQuestion(Long id, QuestionDTO question) throws ChangeSetPersister.NotFoundException;
 
     void  deleteQuestion(Long id);

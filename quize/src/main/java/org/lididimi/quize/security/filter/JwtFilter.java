@@ -22,7 +22,6 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final QuizUserDetailsService restaurantUserDetailsService;
-    private String username;
 
     public JwtFilter(JwtService jwtService, JwtService jwtService1, QuizUserDetailsService restaurantUserDetailsService) {
         this.jwtService = jwtService;
@@ -43,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.warn("JWT token is empty");
             } else {
                 try {
-                    username = jwtService.extractUsername(jwt);
+                    String username = jwtService.extractUsername(jwt);
                     log.info("JWT token received in request: {}", jwt);
 
                     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -76,12 +75,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 
+   public boolean isTeacher() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_TEACHER"));
+    }
+
     public boolean isUser() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER"));
     }
 
     public String currentUser() {
-        return username;
+
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

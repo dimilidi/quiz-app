@@ -5,14 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class QuizDTO {
-
+public class QuizViewDTO {
     private Long id;
 
-    @NotNull(message = "Quiz title is required.")
-    @NotBlank(message = "Quiz title should not be empty.")
     private String title;
 
     private String subject;
@@ -22,4 +21,10 @@ public class QuizDTO {
     private String instructions;
 
     private Integer timeLimit;
+
+    private String createdBy;
+
+    private String createdAt;
+
+    private int questionsCount = 0;
 }

@@ -28,6 +28,7 @@ public class User implements Serializable {
     private String name;
 
     @Column(nullable = false)
+
     private String contactNumber;
 
     @Column(nullable = false, unique = true)
@@ -39,6 +40,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusNameEnum status;
+
+    @ManyToMany()
+    private List<Quiz> quizzes = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(

@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 
 import org.lididimi.quize.model.dto.question.QuestionDTO;
 import org.lididimi.quize.model.entity.Question;
+import org.lididimi.quize.model.entity.Subject;
+import org.lididimi.quize.model.enums.QuestionTypeEnum;
 import org.lididimi.quize.repository.QuestionRepository;
+import org.lididimi.quize.repository.RoleRepository;
+import org.lididimi.quize.repository.SubjectRepository;
 import org.lididimi.quize.service.QuestionService;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
+    private final SubjectRepository subjectRepository;
 
     @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
@@ -40,10 +45,6 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.findById(id).map(this::convertToDTO);
     }
 
-    @Override
-    public List<String> getAllSubjects() {
-        return questionRepository.findDistinctSubject();
-    }
 
     @Override
     public QuestionDTO updateQuestion(Long id, QuestionDTO questionDTO) throws ChangeSetPersister.NotFoundException {
@@ -81,8 +82,8 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDTO dto = new QuestionDTO();
         dto.setId(question.getId());
         dto.setTitle(question.getTitle());
-        dto.setSubject(question.getSubject());
-        dto.setType(question.getType());
+        dto.setSubject(question.getSubject().getName());
+        dto.setType(question.getType().name());
         dto.setChoices(question.getChoices());
         dto.setCorrectAnswers(question.getCorrectAnswers());
         return dto;
@@ -91,11 +92,25 @@ public class QuestionServiceImpl implements QuestionService {
     // Utility method to convert DTO to Question entity
     private Question convertToEntity(QuestionDTO dto) {
         Question question = new Question();
+
         question.setTitle(dto.getTitle());
-        question.setSubject(dto.getSubject());
-        question.setType(dto.getType());
+
+        Optional<Subject> subjectOptional = subjectRepository.findByName(dto.getSubject());
+        if (subjectOptional.isEmpty()) {
+            Subject newSubject = new Subject();
+            newSubject.setName(dto.getSubject());
+            subjectRepository.save(newSubject);
+            question.setSubject(newSubject);
+        } else {
+            question.setSubject(subjectOptional.get());
+        }
+
+        QuestionTypeEnum questionTypeEnum = QuestionTypeEnum.SINGLE.name().equals(dto.getType()) ? QuestionTypeEnum.SINGLE : QuestionTypeEnum.MULTIPLE;
+
+        question.setType(questionTypeEnum);
         question.setChoices(dto.getChoices());
         question.setCorrectAnswers(dto.getCorrectAnswers());
+
         return question;
     }
 }
