@@ -23,6 +23,7 @@ import PasswordResetForm from "./components/PasswordResetForm"
 import ChangePassword from "./components/ChangePassword"
 import CreateQuiz from "./components/quiz/CreateQuiz"
 import AllQuizzes from "./components/quiz/AllQuizzes"
+import UpdateQuiz from "./components/quiz/UpdateQuiz"
 
 function App() {
 	return (
@@ -80,16 +81,20 @@ function App() {
 						element={<ProtectedRoute element={<AddQuestion />} requiredRole="TEACHER" />}
 					/>
 					<Route
-						path="/create-quiz"
-						element={<ProtectedRoute element={<CreateQuiz />} requiredRole="TEACHER" />}
-					/>
-					<Route
 						path="/update-question/:id"
 						element={<ProtectedRoute element={<UpdateQuestion />} requiredRole="TEACHER" />}
 					/>
 					<Route
 						path="/all-questions"
 						element={<ProtectedRoute element={<AllQuestions />} requiredRole="TEACHER" />}
+					/>
+					<Route
+						path="/create-quiz"
+						element={<ProtectedRoute element={<CreateQuiz />} requiredRole="TEACHER" />}
+					/>
+					<Route
+						path="/update-quiz/:id"
+						element={<ProtectedRoute element={<UpdateQuiz />} requiredRole="TEACHER" />}
 					/>
 					<Route
 						path="/all-quizzes"

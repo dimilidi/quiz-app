@@ -11,12 +11,13 @@ const AnswerOptions = ({ question, isChecked, handleAnswerChange, handleCheckbox
 		)
 	}
 
-	const { id, questionType, choices } = question
+	const { id, type, choices } = question
 
-	if (questionType === "single") {
+	if (type === "SINGLE") {
 		return (
 			<div>
 				{choices.sort().map((choice, index) => (
+					
 					<div key={choice} className="form-check mb-3">
 						<input
 							className="form-check-input"
@@ -34,7 +35,7 @@ const AnswerOptions = ({ question, isChecked, handleAnswerChange, handleCheckbox
 				))}
 			</div>
 		)
-	} else if (questionType === "multiple") {
+	} else if (type === "MULTIPLE") {
 		return (
 			<div>
 				{choices.sort().map((choice, index) => (
