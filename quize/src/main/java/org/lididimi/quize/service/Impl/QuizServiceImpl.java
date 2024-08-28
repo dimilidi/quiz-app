@@ -21,6 +21,7 @@ import org.lididimi.quize.service.QuizService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -144,26 +145,50 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public Page<QuizViewDTO> getAllQuizzes(int page, int size, String search) {
-        // Check if the user is an admin
-        if (jwtFilter.isTeacher()) {
-            // Create a Pageable object
-            Pageable pageable = PageRequest.of(page, size);
 
-            // Fetch quizzes with pagination
-            Page<Quiz> quizPage;
-            if (search != null && !search.isEmpty()) {
-                quizPage = quizRepository.findByTitleContainingIgnoreCase(search, pageable);
-            } else {
-                quizPage = quizRepository.findAll(pageable);
-            }
 
-            // Convert the Page<Quiz> to Page<QuizDTO>
-            Page<QuizViewDTO> quizDTOPage = quizPage.map(this::convertToDTO);
+        // Create a Pageable object
+        Pageable pageable = PageRequest.of(page, size);
 
-            return quizDTOPage;
+        // Fetch quizzes with pagination
+        Page<Quiz> quizPage;
+        if (search != null && !search.isEmpty()) {
+            quizPage = quizRepository.findByTitleContainingIgnoreCase(search, pageable);
         } else {
-            throw new BadCredentialsException(QuizConstants.UNAUTHORIZED_ACCESS);
+            quizPage = quizRepository.findAll(pageable);
         }
+
+        // Convert the Page<Quiz> to Page<QuizDTO>
+        Page<QuizViewDTO> quizDTOPage = quizPage.map(this::convertToDTO);
+
+        return quizDTOPage;
+
+    }
+
+
+    @Override
+    @Transactional
+    public Page<QuizViewDTO> getQuizzesWithQuestions(int page, int size, String search) {
+        // Create a Pageable object
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Fetch quizzes with pagination
+        Page<Quiz> quizPage;
+        if (search != null && !search.isEmpty()) {
+            quizPage = quizRepository.findByTitleContainingIgnoreCase(search, pageable);
+        } else {
+            quizPage = quizRepository.findAll(pageable);
+        }
+
+        // Filter quizzes with questions > 0
+        List<Quiz> filteredQuizzes = quizPage.getContent().stream()
+                .filter(quiz -> !quiz.getQuestions().isEmpty())
+                .collect(Collectors.toList());
+
+        // Convert the filtered quizzes to Page<QuizDTO>
+        Page<QuizViewDTO> quizDTOPage = new PageImpl<>(filteredQuizzes.stream().map(this::convertToDTO).collect(Collectors.toList()), pageable, filteredQuizzes.size());
+
+        return quizDTOPage;
     }
 
     @Override

@@ -71,6 +71,17 @@ public class QuizController {
         return ResponseEntity.ok(quizQuestions);
     }
 
+    @GetMapping("/with-questions")
+    public Page<QuizViewDTO> getQuizzesWithQuestions(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "search", required = false) String search) {
+        System.out.println("Received page: " + page);
+        System.out.println("Received size: " + size);
+        System.out.println("Received search: " + search);
+        return quizService.getQuizzesWithQuestions(page, size, search);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<QuizViewDTO> getQuizById(@PathVariable Long id) {
         QuizViewDTO quizById = quizService.getQuizById(id);

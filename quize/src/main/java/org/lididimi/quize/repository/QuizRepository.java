@@ -14,4 +14,6 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     Page<Quiz> findByTitleContainingIgnoreCase(String search, Pageable pageable);
 
     List<Quiz> findBySubject(Subject subject);
+
+    long countBySubject(Subject subject);
 }
