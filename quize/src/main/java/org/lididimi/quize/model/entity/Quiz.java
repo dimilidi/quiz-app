@@ -45,7 +45,7 @@ public class Quiz {
 /*    @ManyToMany()
     private List<User> tookBy;*/
 
-    @ManyToMany()
+    @ManyToMany(mappedBy = "quizzes")
     private List<Question> questions;
 
     @CreationTimestamp

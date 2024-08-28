@@ -6,6 +6,7 @@ import org.lididimi.quize.model.dto.question.QuestionDTO;
 import org.lididimi.quize.model.dto.quiz.QuizDTO;
 import org.lididimi.quize.model.dto.quiz.QuizViewDTO;
 import org.lididimi.quize.service.QuizService;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -69,6 +71,12 @@ public class QuizController {
         return ResponseEntity.ok(quizQuestions);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<QuizViewDTO> getQuizById(@PathVariable Long id) {
+        QuizViewDTO quizById = quizService.getQuizById(id);
+        System.out.println("*****************");
+        System.out.println(quizById);
 
-
+        return ResponseEntity.ok(quizById);
+    }
 }

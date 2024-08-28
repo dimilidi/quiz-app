@@ -24,7 +24,7 @@ public class QuestionDTO {
 
     private String type;
 
-    private String quizTitle;
+    private List<Long> quizIds;
 
     private List<String> choices;
 

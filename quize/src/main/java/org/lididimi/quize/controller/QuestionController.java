@@ -31,7 +31,7 @@ public class QuestionController {
             return ResponseEntity.badRequest().body(errors);
         }
         QuestionDTO createdQuestion = questionService.createQuestion(question);
-        return ResponseEntity.status(CREATED).body(question);
+        return ResponseEntity.status(CREATED).body(createdQuestion);
     }
 
     @GetMapping("/all-questions")

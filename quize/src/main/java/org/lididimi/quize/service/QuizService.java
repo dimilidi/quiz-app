@@ -16,4 +16,6 @@ public interface QuizService {
 
     Page<QuizViewDTO> getAllQuizzes(int page, int size, String search);
 
+    QuizViewDTO getQuizById(Long id);
+
 }

@@ -1,18 +1,22 @@
 package org.lididimi.quize.service.Impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.lididimi.quize.model.dto.question.QuestionDTO;
 import org.lididimi.quize.model.entity.Question;
+import org.lididimi.quize.model.entity.Quiz;
 import org.lididimi.quize.model.entity.Subject;
 import org.lididimi.quize.model.enums.QuestionTypeEnum;
 import org.lididimi.quize.repository.QuestionRepository;
+import org.lididimi.quize.repository.QuizRepository;
 import org.lididimi.quize.repository.RoleRepository;
 import org.lididimi.quize.repository.SubjectRepository;
 import org.lididimi.quize.service.QuestionService;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,14 +28,20 @@ import java.util.stream.Collectors;
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
+    private final  QuizRepository quizRepository;
 
-    @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         Question question = convertToEntity(questionDTO);
+
+        // Fetch quizzes and associate them with the question
+        List<Quiz> quizzes = quizRepository.findAllById(questionDTO.getQuizIds());
+        question.setQuizzes(quizzes);
+
         Question createdQuestion = questionRepository.save(question);
         return convertToDTO(createdQuestion);
     }
 
+    @Transactional
     @Override
     public List<QuestionDTO> getAllQuestions() {
         return questionRepository.findAll()
@@ -41,6 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public Optional<QuestionDTO> getQuestionById(Long id) {
         return questionRepository.findById(id).map(this::convertToDTO);
     }
@@ -86,6 +97,7 @@ public class QuestionServiceImpl implements QuestionService {
         dto.setType(question.getType().name());
         dto.setChoices(question.getChoices());
         dto.setCorrectAnswers(question.getCorrectAnswers());
+        dto.setQuizIds(question.getQuizzes().stream().map(Quiz::getId).collect(Collectors.toList()));
         return dto;
     }
 

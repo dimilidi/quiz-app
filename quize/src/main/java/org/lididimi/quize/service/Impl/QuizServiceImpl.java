@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 public class QuizServiceImpl implements QuizService {
@@ -41,16 +41,22 @@ public class QuizServiceImpl implements QuizService {
     private final JwtFilter jwtFilter;
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
-    private final QuizUserDetailsService quizUserDetailsService;
 
-    public QuizServiceImpl(QuizRepository quizRepository, QuestionRepository questionRepository, ModelMapper modelMapper, JwtFilter jwtFilter, UserRepository userRepository, SubjectRepository subjectRepository, QuizUserDetailsService quizUserDetailsService) {
+
+    public QuizServiceImpl(
+            QuizRepository quizRepository,
+            QuestionRepository questionRepository,
+            ModelMapper modelMapper,
+            JwtFilter jwtFilter,
+            UserRepository userRepository,
+            SubjectRepository subjectRepository
+            ) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.modelMapper = modelMapper;
         this.jwtFilter = jwtFilter;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
-        this.quizUserDetailsService = quizUserDetailsService;
     }
 
     @Override
@@ -85,13 +91,18 @@ public class QuizServiceImpl implements QuizService {
         return questionDTOs;
     }
 
+    @Override
+    @Transactional
+    public QuizViewDTO getQuizById(Long id) {
+        QuizViewDTO quizViewDTO = quizRepository.findById(id).map(this::convertToDTO).orElseThrow(NoSuchElementException::new);
+        return quizViewDTO;
+    }
+
 
     @Override
     public QuizDTO addQuiz(QuizDTO quizDTO) {
         User user = userRepository.findByEmail(jwtFilter.currentUser())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
-
-
 
         Quiz quiz = convertToEntity(quizDTO);
         quiz.setCreatedBy(user);
@@ -161,6 +172,5 @@ public class QuizServiceImpl implements QuizService {
     private Quiz convertToEntity(QuizDTO quizDTO) {
         return modelMapper.map(quizDTO, Quiz.class);
     }
-
 
 }

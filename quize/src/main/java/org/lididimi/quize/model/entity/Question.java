@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.lididimi.quize.model.dto.quiz.QuizDTO;
 import org.lididimi.quize.model.enums.QuestionTypeEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -33,6 +35,15 @@ public class Question {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> correctAnswers;
 
-    @ManyToMany()
-    private List<Quiz> quizzes;
+    @ManyToMany
+    @JoinTable(
+            name = "question_quiz",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "quiz_id")
+    )
+    private List<Quiz> quizzes = new ArrayList<>();
+
+    public void addQuiz(Quiz quiz) {
+        quizzes.add(quiz);
+    }
 }
