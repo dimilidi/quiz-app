@@ -76,6 +76,16 @@ const Navbar = () => {
 										Take Quiz
 									</NavLink>
 								</li>
+								<li className="nav-item">
+									<NavLink className="nav-link" to={"/subjects"}>
+										Categories
+									</NavLink>
+								</li>
+								<li className="nav-item">
+									<NavLink className="nav-link" to={"/quizzes"}>
+										Quizzes
+									</NavLink>
+								</li>
 							</>
 						)}
 					</ul>

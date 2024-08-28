@@ -177,6 +177,35 @@ export const getQuizById = async (id) => {
 }
 
 
+export const getQuizzesWithQuestions = async (page, size, search = '') => {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      throw new Error('No token found. Please log in.');
+    }
+
+    const response = await api.get("/quizzes/with-questions", {
+      params: {
+        page: page,
+        size: size,
+        search: search
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching quizzes with questions:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+
 export const getQuizzesBySubject = async (subjectName) => {
   try {
     const token = localStorage.getItem('token');

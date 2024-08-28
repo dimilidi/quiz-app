@@ -8,9 +8,21 @@ export const api = axios.create({
 export const getSubjects = async() =>{
     try {
       const response = await api.get("/get")
+      console.log(response.data);
+      
       return response.data
     } catch (error) {
       console.error(error)
   
     }
   }
+
+  export const getSubjectsWithQuizCounts = async () => {
+    try {
+      const response = await api.get("/with-quiz-counts");
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  

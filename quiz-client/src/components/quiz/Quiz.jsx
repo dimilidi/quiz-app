@@ -10,7 +10,7 @@ const Quiz = () => {
   const [totalScores, setTotalScores] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const { selectedQuiz } = location.state;
+  const { selectedQuiz } = location.state || {};
 
   useEffect(() => {
     if (selectedQuiz) {
@@ -22,8 +22,7 @@ const Quiz = () => {
     try {
       const questions = await getQuestionsByQuiz(quizId);
       setQuizQuestions(questions);
-	  console.log(questions);
-	  
+      console.log(questions);
     } catch (error) {
       console.error('Failed to fetch quiz data:', error);
     }
