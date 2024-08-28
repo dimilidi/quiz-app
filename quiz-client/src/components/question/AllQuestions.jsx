@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { deleteQuestion, getAllQuestions } from "../../service/QuizService"
+import { deleteQuestion, getAllQuestions, getQuizById } from "../../service/QuizService"
 import { Link } from "react-router-dom"
 import { FaPlus } from "react-icons/fa"
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const AllQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -15,11 +16,34 @@ const AllQuestions = () => {
 
   const fetchQuestions = async () => {
     try {
-      const data = await getAllQuestions();
-      setQuestions(data);
+      const questionsData = await getAllQuestions();
+
+      for (let i = 0; i < questionsData.length; i++) {
+        const question = questionsData[i];
+        let quizNames = [];
+
+        for (let j = 0; j < question.quizIds.length; j++) {
+          const quizId = question.quizIds[j];
+          const quiz = await getQuizById(quizId);
+		  console.log(quiz);
+		  
+
+          if (quiz) {
+            quizNames.push(quiz.title);
+          } else {
+            quizNames.push("Unknown Quiz");
+          }
+        }
+
+        question.quizNames = quizNames.join(", ");
+      }
+
+      setQuestions(questionsData);
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch questions or quizzes:", error);
+      toast.error("Failed to load data.");
+      setIsLoading(false);
     }
   };
 
@@ -57,6 +81,7 @@ const AllQuestions = () => {
             <th>#</th>
             <th>Question Title</th>
             <th>Subject</th>
+            <th>Quizzes</th> {/* New Column */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -66,6 +91,7 @@ const AllQuestions = () => {
               <td>{index + 1}</td>
               <td>{question.title}</td>
               <td>{question.subject}</td>
+              <td>{question.quizNames}</td> {/* Display quiz names */}
               <td>
                 <Link to={`/update-question/${question.id}`} className="btn btn-sm btn-outline-warning me-2">
                   Edit
