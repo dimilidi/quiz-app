@@ -51,4 +51,7 @@ public class Quiz {
     @CreationTimestamp
     @Column(nullable = false)
     private Instant createdDate;
+
+    @Column(nullable = false)
+    private Instant updatedDate;
 }

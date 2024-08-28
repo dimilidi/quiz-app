@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.lididimi.quize.model.enums.QuestionTypeEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,11 +25,11 @@ public class QuestionDTO {
 
     private String type;
 
-    private List<Long> quizIds;
+    private List<Long> quizIds = new ArrayList<>();
 
-    private List<String> choices;
+    private List<String> choices = new ArrayList<>();
 
-    private List<String> correctAnswers;
+    private List<String> correctAnswers = new ArrayList<>();
 
 }
 

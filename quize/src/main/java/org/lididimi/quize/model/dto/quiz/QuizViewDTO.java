@@ -24,7 +24,7 @@ public class QuizViewDTO {
 
     private String createdBy;
 
-    private String createdAt;
+    private String updatedAt;
 
     private int questionsCount = 0;
 }

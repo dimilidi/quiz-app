@@ -74,9 +74,26 @@ public class QuizController {
     @GetMapping("/{id}")
     public ResponseEntity<QuizViewDTO> getQuizById(@PathVariable Long id) {
         QuizViewDTO quizById = quizService.getQuizById(id);
-        System.out.println("*****************");
-        System.out.println(quizById);
-
         return ResponseEntity.ok(quizById);
     }
+
+    @GetMapping("/by-subject")
+    public ResponseEntity<List<QuizViewDTO>> getQuizzesBySubject(@RequestParam String subject) {
+        List<QuizViewDTO> quizzes = quizService.getQuizzesBySubject(subject);
+        return ResponseEntity.ok(quizzes);
+    }
+
+    @PutMapping("/quiz/{id}/update")
+    public ResponseEntity<QuizDTO> updateQuiz(
+            @PathVariable Long id, @RequestBody QuizDTO quiz)  {
+        QuizDTO updatedQuiz = quizService.updateQuiz(id, quiz);
+        return ResponseEntity.ok(updatedQuiz);
+    }
+
+    @DeleteMapping("/quiz/{id}/delete")
+    public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
+        quizService.deleteQuiz(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

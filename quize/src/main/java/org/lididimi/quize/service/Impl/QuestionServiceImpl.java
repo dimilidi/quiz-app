@@ -3,7 +3,11 @@ package org.lididimi.quize.service.Impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.lididimi.quize.constants.QuizConstants;
+import org.lididimi.quize.exception.common.ObjectNotFoundException;
+import org.lididimi.quize.exception.user.BadCredentialsException;
 import org.lididimi.quize.model.dto.question.QuestionDTO;
+import org.lididimi.quize.model.dto.quiz.QuizViewDTO;
 import org.lididimi.quize.model.entity.Question;
 import org.lididimi.quize.model.entity.Quiz;
 import org.lididimi.quize.model.entity.Subject;
@@ -12,13 +16,17 @@ import org.lididimi.quize.repository.QuestionRepository;
 import org.lididimi.quize.repository.QuizRepository;
 import org.lididimi.quize.repository.RoleRepository;
 import org.lididimi.quize.repository.SubjectRepository;
+import org.lididimi.quize.security.filter.JwtFilter;
 import org.lididimi.quize.service.QuestionService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +37,8 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
     private final  QuizRepository quizRepository;
+    private final JwtFilter jwtFilter;
+    private final ModelMapper modelMapper;
 
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         Question question = convertToEntity(questionDTO);
@@ -43,12 +53,29 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Transactional
     @Override
-    public List<QuestionDTO> getAllQuestions() {
-        return questionRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<QuestionDTO> getAllQuestions(int page, int size, String search) {
+        if (jwtFilter.isTeacher()) {
+            // Create a Pageable object
+            Pageable pageable = PageRequest.of(page, size);
+
+            // Fetch quizzes with pagination
+            Page<Question> questionPage;
+            if (search != null && !search.isEmpty()) {
+                questionPage = questionRepository.findByTitleContainingIgnoreCase(search, pageable);
+            } else {
+                questionPage = questionRepository.findAll(pageable);
+            }
+
+            // Convert the Page<Quiz> to Page<QuizDTO>
+            Page<QuestionDTO> questionDTOPage = questionPage.map(this::convertToDTO);
+
+            return questionDTOPage;
+        } else {
+            throw new BadCredentialsException(QuizConstants.UNAUTHORIZED_ACCESS);
+        }
+
     }
+
 
     @Override
     @Transactional
@@ -58,6 +85,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
     @Override
+    @Transactional
     public QuestionDTO updateQuestion(Long id, QuestionDTO questionDTO) throws ChangeSetPersister.NotFoundException {
         Optional<Question> questionById = questionRepository.findById(id);
         if (questionById.isPresent()) {
@@ -65,6 +93,24 @@ public class QuestionServiceImpl implements QuestionService {
             updatedQuestion.setTitle(questionDTO.getTitle());
             updatedQuestion.setChoices(questionDTO.getChoices());
             updatedQuestion.setCorrectAnswers(questionDTO.getCorrectAnswers());
+
+            List<Quiz> quizList = questionDTO.getQuizIds().stream()
+                    .map(quizRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            updatedQuestion.setQuizzes(new ArrayList<>(quizList)); // mutable collection
+
+            Optional<Subject> subjectOptional = subjectRepository.findByName(questionDTO.getSubject());
+            if (subjectOptional.isEmpty()) {
+                Subject newSubject = new Subject();
+                newSubject.setName(questionDTO.getSubject());
+                subjectRepository.save(newSubject);
+                updatedQuestion.setSubject(newSubject);
+            } else {
+                updatedQuestion.setSubject(subjectOptional.get());
+            }
+
             Question savedQuestion = questionRepository.save(updatedQuestion);
             return convertToDTO(savedQuestion);
         } else {
@@ -77,12 +123,45 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.deleteById(id);
     }
 
+
     @Override
     public List<QuestionDTO> getQuestionsForUser(Integer numOfQuestions, String subject) {
         Pageable pageable = PageRequest.of(0, numOfQuestions);
         return questionRepository.findBySubject(subject, pageable)
                 .getContent()
                 .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+  /*  @Override
+    @Transactional
+    public List<QuestionDTO> getQuestionsByQuiz(Long quizId) {
+        // Fetch the quiz by ID
+        Optional<Quiz> quizOptional = quizRepository.findById(quizId);
+        if (quizOptional.isEmpty()) {
+            throw new ObjectNotFoundException("Quiz not found with ID: " + quizId);
+        }
+
+        // Fetch questions associated with the quiz
+        List<Question> questions = questionRepository.findByQuizzesContaining(quizOptional.get());
+
+        // Convert the list of Question entities to QuestionDTOs
+        return questions.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }*/
+
+
+    @Override
+    @Transactional
+    public List<QuestionDTO> getQuestionsByQuiz(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ObjectNotFoundException("Quiz not found"));
+
+        List<Question> questions = questionRepository.findByQuizzesContaining(quiz);
+
+        return questions.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

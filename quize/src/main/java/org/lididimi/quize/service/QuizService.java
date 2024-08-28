@@ -18,4 +18,10 @@ public interface QuizService {
 
     QuizViewDTO getQuizById(Long id);
 
+    List<QuizViewDTO> getQuizzesBySubject(String subjectName);
+
+    QuizDTO updateQuiz(Long id, QuizDTO quizDTO);
+
+    void deleteQuiz(Long id);
+
 }

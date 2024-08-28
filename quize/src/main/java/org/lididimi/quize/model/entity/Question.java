@@ -30,10 +30,10 @@ public class Question {
     private QuestionTypeEnum type;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> choices;
+    private List<String> choices = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> correctAnswers;
+    private List<String> correctAnswers = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -44,6 +44,9 @@ public class Question {
     private List<Quiz> quizzes = new ArrayList<>();
 
     public void addQuiz(Quiz quiz) {
+        if (quizzes == null) {
+            quizzes = new ArrayList<>();
+        }
         quizzes.add(quiz);
     }
 }

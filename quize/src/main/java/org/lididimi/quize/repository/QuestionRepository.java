@@ -1,6 +1,7 @@
 package org.lididimi.quize.repository;
 
 import org.lididimi.quize.model.entity.Question;
+import org.lididimi.quize.model.entity.Quiz;
 import org.lididimi.quize.model.enums.QuestionTypeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,4 +24,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query(value = "SELECT * FROM question q WHERE q.subject = :subject ORDER BY RAND() LIMIT :numOfQuestions", nativeQuery = true)
     List<Question> findRandomQuestionsBySubject(@Param("subject") String subject, @Param("numOfQuestions") Integer numOfQuestions);
 
+    Page<Question> findByTitleContainingIgnoreCase(String search, Pageable pageable);
+
+    List<Question> findByQuizzesContaining(Quiz quiz);
 }
