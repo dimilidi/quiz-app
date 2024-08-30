@@ -9,6 +9,8 @@ import org.lididimi.quize.model.dto.user.UserUpdateDTO;
 import org.lididimi.quize.model.dto.user.UserUpdateStatusDTO;
 import org.lididimi.quize.model.response.SuccessResponse;
 import org.lididimi.quize.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class UserManagementController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserManagementController.class);
     private final UserService userService;
 
     @GetMapping("/get")
@@ -46,6 +49,12 @@ public class UserManagementController {
     @GetMapping("/get/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         UserDTO userDTO = userService.findUserById(id);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @GetMapping("/getByEmail")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam(defaultValue = "") String email) {
+        UserDTO userDTO = userService.findUserByEmail(email);
         return ResponseEntity.ok(userDTO);
     }
 

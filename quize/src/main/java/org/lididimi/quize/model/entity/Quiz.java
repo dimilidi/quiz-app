@@ -33,12 +33,6 @@ public class Quiz {
 
     private Integer timeLimit;
 
-    @Column(nullable = false)
-    private LocalDateTime start;
-
-    @Column(nullable = false)
-    private LocalDateTime end;
-
     @ManyToOne()
     private User createdBy;
 

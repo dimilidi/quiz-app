@@ -16,8 +16,6 @@ public class QuizViewDTO {
 
     private String subject;
 
-    private int numberOfQuestions = 0;
-
     private String instructions;
 
     private Integer timeLimit;

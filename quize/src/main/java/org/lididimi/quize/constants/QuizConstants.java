@@ -25,6 +25,7 @@ public class QuizConstants {
     public static final String ADMIN_UPDATE_INVALID = String.format("At least one admin should be active");
 
 
-    public static final String SUBJECT_NOT_FOUND = String.format("Subject not found");;
+    public static final String SUBJECT_NOT_FOUND = String.format("Subject not found");
+    public static final String QUIZ_NOT_FOUNT = String.format("Quiz not found");
 }
 

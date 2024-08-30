@@ -137,6 +137,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO findUserByEmail(String email) {
+        UserDTO userDTO = Optional.ofNullable(email)
+                .filter(e -> !e.trim().isEmpty())
+                .flatMap(userRepository::findByEmail)
+                .map(this::convertToDto)
+                .orElseThrow(() -> new MissingException(QuizConstants.USER_NOT_FOUND));
+        System.out.println("**************** User ++++++++++++++*");
+        System.out.println(userDTO.getId());
+
+        return userDTO;
+    }
+
+
+    @Override
     public void updateUser(Long id, UserUpdateDTO userUpdateDTO) {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new MissingException(QuizConstants.USER_NOT_FOUND));
 
