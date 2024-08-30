@@ -1,4 +1,33 @@
-.form-container {
+
+
+/* Subjects */
+.subject-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .subject-card:hover {
+    transform: scale(1.05); /* Scale up the card slightly on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Add a shadow effect on hover */
+  }
+  
+  .card-body {
+    text-align: center; /* Center text in the card body */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+
+
+
+
+
+
+
+
+  .form-container {
     width: 30%;
 }
 

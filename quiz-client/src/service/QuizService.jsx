@@ -101,14 +101,14 @@ export const deleteQuestion = async (id) => {
 }
 
 
-export const createQuiz = async (quiz) => {
-  try {
-    const response = await api.post("/quizzes/create", quiz)
-    return response.data
-  } catch (error) {
-    console.error(error)
-  }
-}
+// export const createQuiz = async (quiz) => {
+//   try {
+//     const response = await api.post("/quizzes/create", quiz)
+//     return response.data
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
 export const addQuiz = async (quiz) => {
   try {

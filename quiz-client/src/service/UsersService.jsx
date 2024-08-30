@@ -26,6 +26,37 @@ export const api = axios.create({
 // }
 // };
 
+// export const getAllUsers = async (page, size, search = '') => {
+//     try {
+//         const token = localStorage.getItem('token');
+
+//         if (!token) {
+//             throw new Error('No token found. Please log in.');
+//         }
+
+//         const url = api.get("/get", {
+//             params: {
+//                 page: page, // Dynamic page number
+//                 size: size, // Dynamic page size
+//                 search: search
+//             },
+
+//             headers: {
+//                 'Authorization': `Bearer ${token}`,
+//                 'Accept': 'application/json',
+//                 'Content-Type': 'application/json'
+//             }
+//         });
+//         console.log(url);
+
+//         const response = await url;
+//         return response.data; // Make sure this matches your expected response
+//     } catch (error) {
+//         throw error.response.data || new Error('Failed to get all users');
+//     }
+// };
+
+
 export const getAllUsers = async (page, size, search = '') => {
     try {
         const token = localStorage.getItem('token');
@@ -34,27 +65,25 @@ export const getAllUsers = async (page, size, search = '') => {
             throw new Error('No token found. Please log in.');
         }
 
-        const url = api.get("/get", {
+        const response = await api.get('/get', {
             params: {
-                page: page, // Dynamic page number
-                size: size, // Dynamic page size
-                search: search
+                page,
+                size,
+                search
             },
-
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         });
-        console.log(url);
 
-        const response = await url;
-        return response.data; // Make sure this matches your expected response
+        return response.data;
     } catch (error) {
-        throw error.response.data || new Error('Failed to get all users');
+        throw error.response?.data || new Error('Failed to get all users');
     }
 };
+
 
 
 export const getUserById = async (id) => {
@@ -74,6 +103,30 @@ export const getUserById = async (id) => {
         return response.data;
     } catch (error) {
         throw error.response.data || new Error('Failed to fetch user data');
+    }
+};
+
+
+export const getUserByEmail = async (email) => {
+    try {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            throw new Error('No token found. Please log in.');
+        }
+
+        const response = await api.get('/getByEmail', {
+            params: { email },
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || new Error('Failed to fetch user by email');
     }
 };
 

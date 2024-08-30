@@ -2,15 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getQuestionsByQuiz } from "../../service/QuizService";
 import AnswerOptions from "../../../utils/AnswerOptions";
+import { addQuizAttempt } from "../../service/QuizAttemptService";
+import { useAuth } from "../../context/AuthProvider"
+import { getUserByEmail } from "../../service/UsersService"
 
 const Quiz = () => {
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [totalScores, setTotalScores] = useState(0);
+  const [userId, setUserId] = useState();
+  const [startTime, setStartTime] = useState(""); // Add state for start time
+  const [endTime, setEndTime] = useState(""); // Add state for end time
   const location = useLocation();
   const navigate = useNavigate();
   const { selectedQuiz } = location.state || {};
+  const { user } = useAuth();
 
   useEffect(() => {
     if (selectedQuiz) {
@@ -18,13 +25,33 @@ const Quiz = () => {
     }
   }, [selectedQuiz]);
 
+  useEffect(() => {
+    if (user) {
+      const email = user.email;
+      fetchUser(email);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setStartTime(location.state?.startTime || new Date().toISOString());
+  }, []);
+
   const fetchQuizData = async (quizId) => {
     try {
       const questions = await getQuestionsByQuiz(quizId);
       setQuizQuestions(questions);
-      console.log(questions);
     } catch (error) {
       console.error('Failed to fetch quiz data:', error);
+    }
+  };
+
+  const fetchUser = async (email) => {
+    try {
+      console.log(`Fetching user with email: ${email}`);
+      const fetchedUser = await getUserByEmail(email); 
+      setUserId(fetchedUser.id);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
     }
   };
 
@@ -78,7 +105,7 @@ const Quiz = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let scores = 0;
     quizQuestions.forEach((question) => {
       const selectedAnswer = selectedAnswers.find((answer) => answer.id === question.id);
@@ -91,10 +118,27 @@ const Quiz = () => {
         }
       }
     });
+
     setTotalScores(scores);
-    setSelectedAnswers([]);
-    setCurrentQuestionIndex(0);
-    navigate("/quiz-result", { state: { quizQuestions, totalScores: scores } });
+
+    try {
+      const actualEndTime = new Date().toISOString();
+
+      const payload = {
+        quizId: selectedQuiz,
+        studentId: userId,
+        startTime,
+        endTime: actualEndTime, 
+        score: scores,
+      };
+
+      console.log(payload);
+
+      await addQuizAttempt(payload);
+      navigate("/quiz-result", { state: { quizQuestions, totalScores: scores } });
+    } catch (error) {
+      console.error("Failed to save quiz attempt:", error);
+    }
   };
 
   const handleNextQuestion = () => {

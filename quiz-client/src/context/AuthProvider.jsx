@@ -11,7 +11,10 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const login = (token) => {
-    const decodedToken = jwtDecode(token); // Decode the token to get user info
+    const decodedToken = jwtDecode(token); 
+
+    console.log(decodedToken);
+    
     const userData = {
       email: decodedToken.sub,
       roles: decodedToken.roles,
@@ -19,9 +22,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     setUser(userData);
-    setToken(token);  // Store the token in the state or localStorage
-    localStorage.setItem('token', token); // Optional: Store token in localStorage
-    navigate('/'); // Redirect to home or dashboard after login
+    setToken(token);  
+    localStorage.setItem('token', token); 
+    navigate('/'); 
   };
 
   const logout = async () => {

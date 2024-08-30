@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getQuizzesWithQuestions } from "../../service/QuizService"; 
+import { useNavigate, useLocation } from "react-router-dom";
+import { getQuizzesWithQuestions } from "../../service/QuizService";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
-
 
 const Quizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -12,15 +11,18 @@ const Quizzes = () => {
   const [size, setSize] = useState(10);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const subjectFilter = location.state?.subject || '';
 
   useEffect(() => {
     fetchQuizzesData();
-  }, [page, size]);
+  }, [page, size, subjectFilter]);
 
   const fetchQuizzesData = async () => {
     try {
-      const quizzesData = await getQuizzesWithQuestions(page, size);
-      setQuizzes(quizzesData.content); 
+      const quizzesData = await getQuizzesWithQuestions(page, size, subjectFilter);
+      setQuizzes(quizzesData.content);
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch quizzes:", error);
@@ -31,6 +33,10 @@ const Quizzes = () => {
 
   const handleStartQuiz = (quizId) => {
     navigate("/take-quiz", { state: { selectedQuiz: quizId } });
+  };
+
+  const handleViewDetails = (quizId) => {
+    navigate(`/quiz/${quizId}`);
   };
 
   if (loading) {
@@ -47,20 +53,26 @@ const Quizzes = () => {
         {quizzes.map((quiz) => (
           <div key={quiz.id} className="col-md-4 mb-4">
             <div className="card h-100">
-              <div className="card-body">
+              <div className="card-body text-center">
                 <h5 className="card-title">{quiz.title}</h5>
-                <p className="card-text">
-                  <strong>Questions:</strong> {quiz.numberOfQuestions}
-                </p>
-                <p className="card-text">
-                  <strong>Duration:</strong> {quiz.timeLimit} minutes
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleStartQuiz(quiz.id)}
-                >
-                  Start Quiz
-                </button>
+                <p className="card-text">{quiz.subject}</p>
+                <div className="d-flex gap-2 flex-nowrap">
+                  <button
+                    className="btn btn-primary me-2"
+                    style={{fontSize:"14px"}}
+                    onClick={() => handleStartQuiz(quiz.id)}
+                  >
+                    Start
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    style={{fontSize:"14px"}}
+                    onClick={() => handleViewDetails(quiz.id)}
+                  >
+                    View
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>

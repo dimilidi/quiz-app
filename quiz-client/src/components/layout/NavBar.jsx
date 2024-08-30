@@ -86,6 +86,11 @@ const Navbar = () => {
 										Quizzes
 									</NavLink>
 								</li>
+								<li className="nav-item">
+									<NavLink className="nav-link" to={"/quizzes/attempts"}>
+										My Quizzes
+									</NavLink>
+								</li>
 							</>
 						)}
 					</ul>

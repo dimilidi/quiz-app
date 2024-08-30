@@ -26,6 +26,8 @@ import AllQuizzes from "./components/quiz/AllQuizzes"
 import UpdateQuiz from "./components/quiz/UpdateQuiz"
 import Quizzes from "./components/dashboard/Quizzes"
 import Subjects from "./components/dashboard/Subjects"
+import QuizDetails from "./components/quiz/QuizDetails"
+import StudentQuizAttempts from "./components/dashboard/StudentQuizAttempts"
 
 function App() {
 	return (
@@ -66,6 +68,14 @@ function App() {
 					<Route
 						path="/quizzes"
 						element={<ProtectedRoute element={<Quizzes />} requiredRole="STUDENT" />}
+					/>
+					<Route
+						path="/quiz/:id"
+						element={<ProtectedRoute element={<QuizDetails />} requiredRole="STUDENT" />}
+					/>
+					<Route
+						path="/quizzes/attempts"
+						element={<ProtectedRoute element={<StudentQuizAttempts />} requiredRole="STUDENT" />}
 					/>
 
 
